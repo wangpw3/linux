@@ -1,0 +1,13 @@
+{
+	"create a new main": {
+		"scope": "",
+		"prefix": "main",
+		"body": [
+			"int main(int argc, char const *argv[]) {",
+			"\t$1",
+			"\treturn 0;",
+			"}",
+		],
+		"description": "主函数"
+	}
+}
