@@ -21,7 +21,6 @@ int main(int argc, char const *argv[]) {
 	pthread_create(&id2, NULL, fun2, NULL);
 	pthread_create(&id3, NULL, fun3, NULL);
 
-	
 	pthread_join(id1, NULL);
 	pthread_join(id2, NULL);
 	pthread_join(id3, NULL);
@@ -53,4 +52,5 @@ void * fun3(void * a) {
 	if (f) {
 		pthread_cond_signal(&cond);
 	}
+	return 0;
 }
