@@ -40,12 +40,12 @@ int main(int argc, char const *argv[]) {
 	struct sockaddr_in cli_addr;
     unsigned int len = sizeof(cli_addr);
     pthread_t id[10] = {0};
-	for (int i = 0; i < sum; i++)
+	for (long i = 0; i < sum; i++)
 	{
 		clifd[i] = accept(sockfd, (struct sockaddr *)&cli_addr, &len);
-		int num = i;
-		printf("用户<%d>登陆\n", i);
-		pthread_create(&id[i], NULL, fun, (void *)&num);
+		long num = i;
+		printf("用户<%ld>登陆\n", i);
+		pthread_create(&id[i], NULL, fun, (void *)num);
 	}
 	for (int i = 0; i < sum; i++) {
 		pthread_join(id[i], NULL);
@@ -56,7 +56,7 @@ int main(int argc, char const *argv[]) {
 }
 
 void * fun(void * a) {
-	int idx = (*(int *)a);
+	long idx = (long)a;
 	char buf[110] = {0};
 	while (1) {
 		int len = recv(clifd[idx], buf, sizeof(buf)-1, 0);
@@ -64,14 +64,14 @@ void * fun(void * a) {
             perror("recv"); // 打印接收数据时的错误信息
             break;
         } else if (len == 0) {
-            printf("用户<%d>的连接已经关闭\n", idx);
+            printf("用户<%ld>的连接已经关闭\n", idx);
             break;
         }
 		if (strcmp(buf, "quit") == 0) {
-            printf("用户<%d>请求退出\n", idx);
+            printf("用户<%ld>请求退出\n", idx);
             break;
         }
-		printf("%d->%s<%d\n", idx, buf, len);
+		printf("%ld->%s<%d\n", idx, buf, len);
 		for (int i = 0; i < sum; i++) {
 			if (i != idx) {
 				send(clifd[i], buf, len, 0);
