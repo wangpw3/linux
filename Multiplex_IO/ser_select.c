@@ -54,6 +54,7 @@ int main(int argc, char const *argv[]) {
 	struct timeval *timeout > 设置监听超时时间 / 死等NULL
 	*/
 	//select完成多路IO复用
+	maxfd = sockfd;
 	int cont = 0;
 	struct sockaddr_in cli_addr;
     unsigned int len = sizeof(cli_addr);
