@@ -14,23 +14,19 @@ void * fun(void * a);
 int sockfd;
 
 int main(int argc, char const *argv[]) {
-    getchar();
+	
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {
         perror("socker");
     }
-	int val = 1;
-	setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&val,sizeof(int));
-    
     struct sockaddr_in cli_addr;
     cli_addr.sin_family = AF_INET;
-    cli_addr.sin_port = htons(12349);
+    cli_addr.sin_port = htons(12340);
     cli_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
     int res = connect(sockfd, (struct sockaddr *) &cli_addr, sizeof(cli_addr));
     if (res == -1) {
         perror("connect");
     }
-    
     char r_buf[110] = {0};
     int a = 0;
     pthread_t id = 0;

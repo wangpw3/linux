@@ -11,10 +11,10 @@
 
 void * fun(void * a);
 
-int clifd[5], sum;
+int clifd[10], sum;
 
 int main(int argc, char const *argv[]) {
-    
+    memset(clifd, -1, sizeof(clifd));
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd == -1) {
         perror("socker");
@@ -24,14 +24,14 @@ int main(int argc, char const *argv[]) {
     
     struct sockaddr_in ser_addr;
     ser_addr.sin_family = AF_INET;
-    ser_addr.sin_port = htons(12349);//htons:把端口号转换为网络字节序
+    ser_addr.sin_port = htons(12340);//htons:把端口号转换为网络字节序
     ser_addr.sin_addr.s_addr = inet_addr("127.0.0.1");//inet_addr:把点分十进制转换为网络字节序
     int res = bind(sockfd, (struct sockaddr *)&ser_addr, sizeof(ser_addr));
     if (res == -1) {
         perror("bind");
     }
     
-    res = listen(sockfd, 3);
+    res = listen(sockfd, 5);
     if (res == -1) {
         perror("listen");
     }
@@ -39,11 +39,13 @@ int main(int argc, char const *argv[]) {
 	scanf("%d", &sum);
 	struct sockaddr_in cli_addr;
     unsigned int len = sizeof(cli_addr);
-    pthread_t id[5] = {0};
+    pthread_t id[10] = {0};
 	for (int i = 0; i < sum; i++)
 	{
 		clifd[i] = accept(sockfd, (struct sockaddr *)&cli_addr, &len);
-		pthread_create(&id[i], NULL, fun, (void *)&i);
+		int num = i;
+		printf("用户<%d>登陆\n", i);
+		pthread_create(&id[i], NULL, fun, (void *)&num);
 	}
 	for (int i = 0; i < sum; i++) {
 		pthread_join(id[i], NULL);
@@ -54,17 +56,30 @@ int main(int argc, char const *argv[]) {
 }
 
 void * fun(void * a) {
-	int idx = *(int *)a;
+	int idx = (*(int *)a);
 	char buf[110] = {0};
 	while (1) {
-		int len = recv(clifd[idx], buf, strlen(buf), 0);
-		printf("%d->%s<\n", idx, buf);
+		int len = recv(clifd[idx], buf, sizeof(buf)-1, 0);
+		if (len == -1) {
+            perror("recv"); // 打印接收数据时的错误信息
+            break;
+        } else if (len == 0) {
+            printf("用户<%d>的连接已经关闭\n", idx);
+            break;
+        }
+		if (strcmp(buf, "quit") == 0) {
+            printf("用户<%d>请求退出\n", idx);
+            break;
+        }
+		printf("%d->%s<%d\n", idx, buf, len);
 		for (int i = 0; i < sum; i++) {
 			if (i != idx) {
-				send(clifd[i], buf, strlen(buf), 0);
+				send(clifd[i], buf, len, 0);
 			}
 		}
 		memset(buf, 0, sizeof(buf));
 	}
+	close(clifd[idx]);
+    clifd[idx] = -1;
     return 0;
 }
