@@ -73,7 +73,7 @@ void * fun(void * a) {
         }
 		printf("%ld->%s<%d\n", idx, buf, len);
 		for (int i = 0; i < sum; i++) {
-			if (i != idx) {
+			if (i != idx && clifd[i] != -1) {
 				send(clifd[i], buf, len, 0);
 			}
 		}
